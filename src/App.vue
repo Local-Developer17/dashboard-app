@@ -1,18 +1,16 @@
 <template>
   <div id="app">
-    <h1 v-if="state.isVisible" class="text-3xl font-bold underline">Your title is here!</h1>
-    <button @click="state.isVisible = !state.isVisible">Click Here</button>
-    <button @click="increment">Count is {{ state.count }}</button>
+    <div class="main w-full h-full">
+      <div class="left h-full w-full flex flex-col">
+        <HeaderVue />
+        <main>
+          <RouterView />
+        </main>
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
-let state = reactive({
-  isVisible: false,
-  count: 2,
-})
-const increment = () => {
-  state.count++
-}
+import HeaderVue from "./components/HeaderVue.vue";
 </script>
 <style scoped></style>
