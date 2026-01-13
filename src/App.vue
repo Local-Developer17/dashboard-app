@@ -3,7 +3,7 @@
     <div class="main w-full h-full">
       <div class="left h-full w-full flex flex-col">
         <HeaderVue />
-        <main>
+        <main class="h-full">
           <RouterView />
         </main>
       </div>
@@ -13,4 +13,3 @@
 <script setup>
 import HeaderVue from "./components/HeaderVue.vue";
 </script>
-<style scoped></style>

@@ -1,3 +1,6 @@
 <template>
-  <div>People</div>
+  <PeopleHeader />
 </template>
+<script setup>
+import PeopleHeader from "@/components/PeopleHeader.vue";
+</script>
