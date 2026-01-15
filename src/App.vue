@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="main w-full h-full">
+    <div class="main w-full h-full px-16 py-8">
       <div class="left h-full w-full flex flex-col">
         <HeaderVue />
         <main class="h-full">

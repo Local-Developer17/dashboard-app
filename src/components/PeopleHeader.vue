@@ -1,5 +1,5 @@
 <template>
-    <div class="people-main p-16 h-1/3 py-4">
+    <div class="people-main h-1/4 py-4">
         <div class="title h-1/2">
             <h1 :class="titleStyle">{{ peopleTitle }}</h1>
         </div>
@@ -17,13 +17,28 @@
                     </div>
                 </ul>
             </div>
-            <div class="row-right w-1/2"></div>
+            <div class="row-right flex justify-items-end w-1/2 gap-4 justify-end">
+                <div class="w-1/8 flex flex-col justify-end " v-for="item in selectItems" :key="item.label">
+                    <select appearance-none v-model="item.value"
+                        class="combobox border rounded-full py-2 w-full text-center">
+                        <option value="" disabled hidden>
+                            {{ item.label }}
+                        </option>
+                        <option v-for="option in item.options" :key="option" :value="option">
+                            {{ option }}
+                        </option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, defineEmits } from 'vue'
+
+
+const emit = defineEmits(['onChange'])
 
 const peopleTitle = 'People'
 
@@ -51,4 +66,23 @@ const progress = reactive({
         { label: 'Output', percent: '14%', backgroundColor: 'bg-purple-100' },
     ],
 })
+const selectItems = reactive([
+    {
+        label: 'Directory',
+        options: ['Option 1', 'Option 2', 'Option 3'],
+        value: '', // ✅ MUST match placeholder value
+    },
+    {
+        label: 'Org Chat',
+        options: ['Option 1', 'Option 2', 'Option 3'],
+        value: '',
+    },
+    {
+        label: 'Insights',
+        options: ['Option 1', 'Option 2', 'Option 3'],
+        value: '',
+    },
+])
 </script>
+
+<style scoped></style>

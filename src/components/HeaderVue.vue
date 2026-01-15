@@ -1,12 +1,8 @@
 <template>
-  <header class="h-24 flex items-center justify-end px-16">
+  <header class="h-24 flex items-center justify-end ">
     <nav class="bg-white p-2 flex gap-4 rounded-full border-solid">
-      <RouterLink
-        v-for="link in routerLinks"
-        :key="link.to"
-        :to="link.to"
-        class="link py-2 px-4 rounded-full font-medium"
-      >
+      <RouterLink v-for="link in routerLinks" :key="link.to" :to="link.to"
+        class="link py-2 px-4 rounded-full font-medium">
         {{ link.name }}
       </RouterLink>
     </nav>
