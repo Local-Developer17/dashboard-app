@@ -4,30 +4,20 @@
             <h1 :class="titleStyle">{{ peopleTitle }}</h1>
         </div>
         <div class="people-row flex w-full">
-            <div class="row-left  w-1/2">
+            <div class="row-left w-1/2">
                 <ul class="w-full flex gap-4">
                     <div class="progress-div w-full" v-for="item in progress.listItems" :key="item.label">
-                        <p class="pl-2"> {{ item.label }}</p>
-                        <li :class="[listItemsStyle, 'w-full bg-gray-200 rounded-full']">
+                        <p class="pl-2">{{ item.label }}</p>
+                        <li :class="listItemsStyle">
                             <span :class="[item.backgroundColor, 'rounded-full px-4 py-2 text-center']"
-                                :style="{ width: item.percent }">{{
-                                    item.percent
-                                }}</span>
+                                :style="{ width: item.percent }">{{ item.percent }}</span>
                         </li>
                     </div>
                 </ul>
             </div>
             <div class="row-right flex justify-items-end w-1/2 gap-4 justify-end">
-                <div class="w-1/8 flex flex-col justify-end " v-for="item in selectItems" :key="item.label">
-                    <select appearance-none v-model="item.value"
-                        class="combobox border rounded-full py-2 w-full text-center">
-                        <option value="" disabled hidden>
-                            {{ item.label }}
-                        </option>
-                        <option v-for="option in item.options" :key="option" :value="option">
-                            {{ option }}
-                        </option>
-                    </select>
+                <div class="w-1/7 flex flex-col justify-end" v-for="item in selectItems" :key="item.label">
+                    <DropdownCombo :comboOptions="item.options" :label="item.label" @on-change="onChange" />
                 </div>
             </div>
         </div>
@@ -36,17 +26,13 @@
 
 <script setup>
 import { reactive, defineEmits } from 'vue'
-
+import DropdownCombo from './DropdownCombo.vue'
 
 const emit = defineEmits(['onChange'])
 
 const peopleTitle = 'People'
 
-const titleStyle = [
-    'font-sans',
-    'text-7xl',
-    'text-gray-800',
-]
+const titleStyle = ['font-sans', 'text-7xl', 'text-gray-800']
 
 const listItemsStyle = [
     'items-center',
@@ -56,6 +42,10 @@ const listItemsStyle = [
     'font-medium',
     'text-gray-600',
     'rounded-full',
+    'w-full',
+    'bg-gray-200',
+    'rounded-full',
+    'shadow-lg',
 ]
 
 const progress = reactive({
@@ -70,7 +60,7 @@ const selectItems = reactive([
     {
         label: 'Directory',
         options: ['Option 1', 'Option 2', 'Option 3'],
-        value: '', // ✅ MUST match placeholder value
+        value: '',
     },
     {
         label: 'Org Chat',
@@ -83,6 +73,9 @@ const selectItems = reactive([
         value: '',
     },
 ])
+const onChange = (value) => {
+    console.log(value)
+}
 </script>
 
 <style scoped></style>
