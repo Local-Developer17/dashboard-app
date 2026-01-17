@@ -17,7 +17,7 @@
             </div>
             <div class="row-right flex justify-items-end w-1/2 gap-4 justify-end">
                 <div class="w-1/7 flex flex-col justify-end" v-for="item in selectItems" :key="item.label">
-                    <DropdownCombo :comboOptions="item.options" :label="item.label" @on-change="onChange" />
+                    <DropdownCombo v-model="item.value" :comboOptions="item.options" :label="item.label" />
                 </div>
             </div>
         </div>
@@ -25,10 +25,8 @@
 </template>
 
 <script setup>
-import { reactive, defineEmits } from 'vue'
+import { reactive } from 'vue'
 import DropdownCombo from './DropdownCombo.vue'
-
-const emit = defineEmits(['onChange'])
 
 const peopleTitle = 'People'
 
@@ -73,9 +71,6 @@ const selectItems = reactive([
         value: '',
     },
 ])
-const onChange = (value) => {
-    console.log(value)
-}
 </script>
 
 <style scoped></style>

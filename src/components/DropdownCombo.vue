@@ -1,20 +1,23 @@
 <template>
     <div class="main">
-        <select v-model="selectedModel" :class="comboStyle" @change="onChange">
+        <select :value="modelValue" :class="comboStyle" @change="onChange">
             <option value="" disabled hidden>
                 {{ label }}
             </option>
-            <option v-for="option in comboOptions">
+            <option v-for="option in comboOptions" :key="option" :value="option">
                 {{ option }}
             </option>
         </select>
     </div>
 </template>
 <script setup>
-import { defineProps, ref, defineEmits } from 'vue'
-const selectedModel = ref('')
-const emit = defineEmits(['onChange'])
+import { ref, defineEmits } from 'vue'
+const emit = defineEmits(['update:modelValue', 'change'])
 const props = defineProps({
+    modelValue: {
+        type: String,
+        default: '',
+    },
     label: {
         type: String,
         default: 'Select an option',
@@ -24,11 +27,12 @@ const props = defineProps({
         required: true,
     },
     comboStyle: {
-        type: String,
+        type: [String, Array],
         default: 'combobox rounded-full py-2 w-full text-center shadow-md',
     },
 })
-const onChange = () => {
-    emit('onChange', selectedModel.value)
+const onChange = (event) => {
+    emit('update:modelValue', event.target.value)
+    emit('change', event.target.value)
 }
 </script>
