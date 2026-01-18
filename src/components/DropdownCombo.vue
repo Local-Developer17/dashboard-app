@@ -1,5 +1,5 @@
 <template>
-    <div class="main">
+    <div :class="containerStyle">
         <select :value="modelValue" :class="comboStyle" @change="onChange">
             <option value="" disabled hidden>
                 {{ label }}
@@ -29,6 +29,10 @@ const props = defineProps({
     comboStyle: {
         type: [String, Array],
         default: 'combobox rounded-full py-2 w-full text-center shadow-md',
+    },
+    containerStyle: {
+        type: [String, Array],
+        default: '',
     },
 })
 const onChange = (event) => {

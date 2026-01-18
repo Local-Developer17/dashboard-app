@@ -1,8 +1,9 @@
 <template>
-    <div class="filter-main flex flex-row gap-4 w-full py-4">
+    <div class="filter-main flex flex-row gap-4 w-full py-2">
         <div class="filter-left flex w-4/5 bg-white p-4 rounded-lg gap-4">
             <DropdownCombo v-for="filter in leftFilters" :key="filter.label" :label="filter.label"
-                :comboOptions="filter.options" :comboStyle="filterStyle" v-model="filter.value" />
+                :comboOptions="filter.options" :comboStyle="filterStyle" v-model="filter.value"
+                :containerStyle="'w-1/7'" @change="onFilterChange" />
             <div class="search-con flex items-center">
                 <input type="text" v-model="searchQuery" placeholder="Search..."
                     class="rounded-full px-4 py-2 shadow-md" />
@@ -21,8 +22,9 @@
     </div>
 </template>
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { inject, reactive, ref } from 'vue'
 import DropdownCombo from './DropdownCombo.vue'
+const selectedFilter = inject('selectedFilter')
 const leftFilters = reactive([
     {
         label: 'Column',
@@ -46,7 +48,7 @@ const leftFilters = reactive([
     },
     {
         label: 'Status',
-        options: ['Tag1', 'Tag2', 'Tag3'],
+        options: ['Active', 'Inactive', 'Pending'],
         value: '',
     },
     {
@@ -72,5 +74,9 @@ const actionButtons = [
 ]
 const onSearch = (event) => {
     console.log('Search query:', searchQuery.value)
+}
+const onFilterChange = (val) => {
+    selectedFilter.value = val
+    console.log(selectedFilter.value)
 }
 </script>
