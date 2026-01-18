@@ -5,19 +5,11 @@
         </div>
         <div class="people-row flex w-full">
             <div class="row-left w-1/2">
-                <ul class="w-full flex gap-4">
-                    <div class="progress-div w-full" v-for="item in progress.listItems" :key="item.label">
-                        <p class="pl-2">{{ item.label }}</p>
-                        <li :class="listItemsStyle">
-                            <span :class="[item.backgroundColor, 'rounded-full px-4 py-2 text-center']"
-                                :style="{ width: item.percent }">{{ item.percent }}</span>
-                        </li>
-                    </div>
-                </ul>
+                <ProgressBar :listItems="progress.listItems" :listItemsStyle="listItemsStyle" />
             </div>
             <div class="row-right flex justify-items-end w-1/2 gap-4 justify-end">
                 <div class="w-1/7 flex flex-col justify-end" v-for="item in selectItems" :key="item.label">
-                    <DropdownCombo :comboOptions="item.options" :label="item.label" @on-change="onChange" />
+                    <DropdownCombo v-model="item.value" :comboOptions="item.options" :label="item.label" />
                 </div>
             </div>
         </div>
@@ -25,11 +17,9 @@
 </template>
 
 <script setup>
-import { reactive, defineEmits } from 'vue'
+import { reactive } from 'vue'
 import DropdownCombo from './DropdownCombo.vue'
-
-const emit = defineEmits(['onChange'])
-
+import ProgressBar from './ProgressBar.vue'
 const peopleTitle = 'People'
 
 const titleStyle = ['font-sans', 'text-7xl', 'text-gray-800']
@@ -73,9 +63,6 @@ const selectItems = reactive([
         value: '',
     },
 ])
-const onChange = (value) => {
-    console.log(value)
-}
 </script>
 
 <style scoped></style>
