@@ -20,7 +20,6 @@ const props = defineProps({
     },
     listItemsStyle: {
         type: Array,
-        required: true,
         default: [
             'items-center',
             'text-left',
