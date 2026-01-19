@@ -23,6 +23,12 @@
                         <td class="px-4 py-2">{{ row.department }}</td>
                         <td class="px-4 py-2">{{ row.location }}</td>
                         <td class="px-4 py-2">{{ row.status }}</td>
+                        <td class="px-4 py-2">
+                            <button @click="modalOpen = true"
+                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                Details
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -48,9 +54,11 @@
             </button>
         </div>
     </div>
+    <DetailModal :open="modalOpen" @close="modalOpen = false" />
 </template>
 <script setup>
-import { computed, inject, onMounted, reactive, ref, watch } from 'vue'
+import { computed, inject, onMounted, reactive, ref } from 'vue'
+import DetailModal from './DetailModal.vue'
 const selectedFilter = inject('selectedFilter')
 const tableHeaders = reactive([
     { label: 'Name', key: 'name' },
@@ -58,13 +66,14 @@ const tableHeaders = reactive([
     { label: 'Department', key: 'department' },
     { label: 'Location', key: 'location' },
     { label: 'Status', key: 'status' },
+    { label: 'Actions', key: 'actions' },
 ])
 const selectedIds = ref(new Set())
 const tableRows = reactive([])
 const curPage = ref(1)
 const pageSize = ref(5)
 const totalRows = computed(() => Math.ceil(tableRows.length / pageSize.value))
-
+const modalOpen = ref(false)
 onMounted(() => getData())
 
 async function getData() {
