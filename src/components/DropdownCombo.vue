@@ -1,6 +1,6 @@
 <template>
     <div :class="containerStyle">
-        <select :value="modelValue" :class="comboStyle" @change="onChange">
+        <select :value="modelValue" :class="comboStyle" @change="onChange" @click="onClick">
             <option value="" disabled hidden>
                 {{ label }}
             </option>
@@ -12,7 +12,7 @@
 </template>
 <script setup>
 import { defineEmits } from 'vue'
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits(['update:modelValue', 'change', 'click'])
 const props = defineProps({
     modelValue: {
         type: String,
@@ -38,5 +38,8 @@ const props = defineProps({
 const onChange = (event) => {
     emit('update:modelValue', event.target.value)
     emit('change', event.target.value)
+}
+const onClick = (event) => {
+    emit('click', event.target)
 }
 </script>

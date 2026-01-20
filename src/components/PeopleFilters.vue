@@ -3,7 +3,7 @@
         <div class="filter-left flex w-4/5 bg-white p-4 rounded-lg gap-4">
             <DropdownCombo v-for="filter in leftFilters" :key="filter.label" :label="filter.label"
                 :comboOptions="filter.options" :comboStyle="filterStyle" v-model="filter.value"
-                :containerStyle="'w-1/7'" @change="onFilterChange" />
+                :containerStyle="'w-1/7'" @change="onFilterChange" @click="onClick" />
             <div class="search-con flex items-center">
                 <input type="text" v-model="searchQuery" placeholder="Search..."
                     class="rounded-full px-4 py-2 shadow-md" />
@@ -24,6 +24,11 @@
 <script setup>
 import { inject, reactive, ref } from 'vue'
 import DropdownCombo from './DropdownCombo.vue'
+const searchQuery = ref('')
+const departmentOptions = ref([])
+const filterStyle = 'shadow-md rounded-lg p-2'
+const buttonStyle = 'bg-white text-black rounded-full shadow-md rounded-lg px-2'
+
 const selectedFilter = inject('selectedFilter')
 const leftFilters = reactive([
     {
@@ -33,11 +38,11 @@ const leftFilters = reactive([
     },
     {
         label: 'Department',
-        options: ['Admin', 'User', 'Guest'],
+        options: departmentOptions.value,
         value: '',
     },
     {
-        label: 'Site',
+        label: 'Role',
         options: ['Manager', 'Employee', 'Intern'],
         value: '',
     },
@@ -57,9 +62,6 @@ const leftFilters = reactive([
         value: '',
     },
 ])
-const searchQuery = ref('')
-const filterStyle = 'shadow-md rounded-lg p-2'
-const buttonStyle = 'bg-white text-black rounded-full shadow-md rounded-lg px-2'
 
 const actionButtons = [
     {
@@ -72,11 +74,30 @@ const actionButtons = [
         label: 'Team',
     },
 ]
+async function getData() {
+    const url = 'https://dummyjson.com/users'
+    try {
+        fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+                data.users.forEach((user) => {
+                    if (!departmentOptions.value.includes(user.company.department)) {
+                        departmentOptions.value.push(user.company.department)
+                    }
+                })
+            })
+    } catch (error) {
+        console.log('Error fetching data:', error)
+    }
+}
+const onClick = () => {
+    getData()
+    console.log(departmentOptions.value)
+}
 const onSearch = (event) => {
     console.log('Search query:', searchQuery.value)
 }
 const onFilterChange = (val) => {
     selectedFilter.value = val
-    console.log(selectedFilter.value)
 }
 </script>

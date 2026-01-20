@@ -1,5 +1,5 @@
 <template>
-    <div class="people-table w-full h-3/5 bg-white rounded-lg shadow-md p-4 flex flex-col overflow-hidden">
+    <div class="people-table w-full h-[55vh] bg-white rounded-lg shadow-md p-4 flex flex-col overflow-hidden">
         <div class="table-wrapper flex-1 overflow-y-auto overflow-x-hidden">
             <table class="w-full table-auto">
                 <thead>
@@ -24,7 +24,7 @@
                         <td class="px-4 py-2">{{ row.location }}</td>
                         <td class="px-4 py-2">{{ row.status }}</td>
                         <td class="px-4 py-2">
-                            <button @click="modalOpen = true"
+                            <button @click="onOpen(row)"
                                 class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                                 Details
                             </button>
@@ -34,12 +34,15 @@
             </table>
         </div>
         <div class="pagination mt-4 flex justify-center">
+            <button @click="curPage = firstPage" class="px-3 py-1 mx-1 bg-gray-400 rounded hover:bg-gray-300">
+                First Page
+            </button>
             <button class="px-3 py-1 mx-1 bg-gray-200 rounded hover:bg-gray-300" :disabled="curPage === 1"
                 @click="curPage--">
-                Previous
+                Prev
             </button>
             <span class="px-3 py-1 mx-1">Page {{ curPage }} </span>
-            <span>Page Per Size:
+            <span>Page Size Per Row:
                 <select name="pageSize" id="pageSize" v-model.number="pageSize"
                     class="ml-2 border border-gray-300 rounded px-2 py-1">
                     <option value="" disabled hidden>
@@ -52,12 +55,25 @@
                 @click="curPage++">
                 Next
             </button>
+            <button @click="curPage = lastPage" class="px-3 py-1 mx-1 bg-gray-400 rounded hover:bg-gray-300">
+                Last Page
+            </button>
         </div>
     </div>
-    <DetailModal :open="modalOpen" @close="modalOpen = false" />
+    <DetailModal :open="modalOpen" @close="modalOpen = false" modalTitle="Employee Details">
+        <template #slotBody>
+            <div class="size-full">
+                <div class="basic-info">
+                    <div class="left-con"></div>
+                    <div class="right"></div>
+                </div>
+                <div class="detail-con"></div>
+            </div>
+        </template>
+    </DetailModal>
 </template>
 <script setup>
-import { computed, inject, onMounted, reactive, ref } from 'vue'
+import { computed, inject, onMounted, reactive, ref, watch } from 'vue'
 import DetailModal from './DetailModal.vue'
 const selectedFilter = inject('selectedFilter')
 const tableHeaders = reactive([
@@ -74,19 +90,21 @@ const curPage = ref(1)
 const pageSize = ref(5)
 const totalRows = computed(() => Math.ceil(tableRows.length / pageSize.value))
 const modalOpen = ref(false)
+const employeeDetails = ref({})
 onMounted(() => getData())
 
 async function getData() {
-    const url = 'https://jsonplaceholder.typicode.com/users'
+    const url = 'https://dummyjson.com/users'
     try {
         const response = await fetch(url)
         const data = await response.json()
-        data.forEach((row) => {
+        console.log(data)
+        data.users.forEach((row) => {
             row.id = row.id
-            row.name = row.name || row.name
-            row.role = row.username || row.role
-            row.department = row.company?.name || row.department
-            row.location = row.address?.city || row.location
+            row.name = row.firstName + ' ' + row.lastName
+            row.role = row.company?.title
+            row.department = row.company?.department
+            row.location = row.address.country + '/' + row.address.state
             row.status = Math.floor(Math.random() * 2) === 0 ? 'Active' : 'Inactive'
             tableRows.push(row)
         })
@@ -110,7 +128,7 @@ const isPageFullySelected = computed(
         paginatedRows.value.every((row) => selectedIds.value.has(row.id)),
 )
 const filteredRows = computed(() => {
-    if (!selectedFilter.value) {
+    if (tableRows.filter((row) => row.status === selectedFilter.value).length === 0) {
         return tableRows
     } else {
         return tableRows.filter((row) => row.status === selectedFilter.value)
@@ -125,10 +143,22 @@ const pageSizes = computed(() => {
     const sizes = []
     tableRows.forEach((_, index) => {
         const size = (index + 1) * 5
-        if (size <= tableRows.length && !sizes.includes(size)) {
+        if (size <= filteredRows.value.length && !sizes.includes(size)) {
             sizes.push(size)
         }
     })
     return sizes
+})
+const firstPage = computed(() => 1)
+const lastPage = computed(() => Math.ceil(filteredRows.value.length / pageSize.value))
+const onOpen = (row) => {
+    modalOpen.value = true
+    employeeDetails.value = tableRows.find((r) => r.id === row.id)
+    console.log('Employee Details:', employeeDetails)
+}
+watch(pageSize, (newSize) => {
+    if (newSize >= filteredRows.value.length) {
+        curPage.value = 1
+    }
 })
 </script>
