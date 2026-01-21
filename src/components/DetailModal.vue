@@ -6,9 +6,11 @@
                 <div class="modal-body h-4/5 w-full">
                     <slot name="slotBody"></slot>
                 </div>
+                
                 <div class="button-con w-full flex justify-end mt-4 gap-4">
+                    <slot name="buttons"></slot>
                     <button @click="emit('close')"
-                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 absolute">
+                        class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
                         Close
                     </button>
                     <button @click="emit('close')"

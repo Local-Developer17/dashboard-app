@@ -23,7 +23,7 @@
             <td class="px-4 py-2">{{ row.location }}</td>
             <td class="px-4 py-2">{{ row.status }}</td>
             <td class="px-4 py-2">
-              <button @click="onOpen(row)" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+              <button :class="blueButton" @click="onOpen(row)" class="">
                 Details
               </button>
             </td>
@@ -59,17 +59,22 @@
   </div>
   <DetailModal :open="modalOpen" @close="modalOpen = false" modalTitle="Employee Details">
     <template #slotBody>
-      <div class="size-full">
-        <div class="basic-info h-4/5 flex">
-          <div class="left-con flex-col">
-            <div class="size-1/3" v-for="item in leftFields">
-              <p>{{ item.label }}</p>
+      <div class="size-full flex flex-col gap-4">
+        <div class="basic-info h-4/5 flex gap-2">
+          <div class="left-con w-1/2 grid grid-cols-2 grid-rows-4 gap-3">
+            <div class="shadow-md p-3 rounded-lg flex flex-col items-center justify-center text-sm" v-for="item in leftFields">
+              <p class="w-full font-bold text-start">{{ item.title }}</p>
+              <p class="text-center">{{ item.label }}</p>
             </div>
           </div>
-          <div class="right"></div>
+          <div class="right-con w-1/2 flex justify-center">
+            <img :src="employeeDetails?.image" alt="">
+          </div>
         </div>
-        <div class="detail-con h-1/5"></div>
       </div>
+    </template>
+    <template #buttons>
+      <button v-for="button in modalButtons" :class="button.style">{{ button.label }}</button>
     </template>
   </DetailModal>
 </template>
@@ -77,6 +82,7 @@
 import { computed, inject, onMounted, reactive, ref, watch } from 'vue'
 import DetailModal from './DetailModal.vue'
 const selectedFilter = inject('selectedFilter')
+const blueButton = inject('blueButton')
 const tableHeaders = reactive([
   { label: 'Name', key: 'name' },
   { label: 'Role', key: 'role' },
@@ -95,15 +101,48 @@ const modalOpen = ref(false)
 const employeeDetails = ref({})
 const leftFields = reactive([
   {
-    label: '',
+    title: 'Full Name:',
+    label: ''
   },
   {
-    label: '',
+    title: 'Birth Date:',
+    label: ''
   },
   {
-    label: '',
+    title: 'Gender:',
+    label: ''
+  },
+  {
+    title: 'Department:',
+    label: ''
+  },
+  {
+    title: 'Title:',
+    label: ''
+  },
+  {
+    title: 'Education:',
+    label: ''
+  },
+  {
+    title: 'Location:',
+    label: ''
+  },
+  {
+    title: 'Address:',
+    label: ''
   },
 ])
+const modalButtons = [
+  {
+    style: blueButton.value + ' self-start',
+    label: 'Appointment'
+  },
+  {
+    style: blueButton.value,
+    label: 'Send Email'
+  }
+]
 onMounted(() => getData())
 
 async function getData() {
@@ -167,9 +206,15 @@ const lastPage = computed(() => Math.ceil(filteredRows.value.length / pageSize.v
 const onOpen = (row) => {
   modalOpen.value = true
   employeeDetails.value = tableRows.find((r) => r.id === row.id)
+  console.log(employeeDetails.value)
   leftFields[0].label = employeeDetails.value.firstName + ' ' + employeeDetails.value.lastName
   leftFields[1].label = employeeDetails.value.birthDate
-  leftFields[2].label = employeeDetails.value.gender
+  leftFields[2].label = employeeDetails.value.gender[0].toUpperCase() + employeeDetails.value.gender.slice(1,employeeDetails.value.gender.length)
+  leftFields[3].label = employeeDetails.value.company.department
+  leftFields[4].label = employeeDetails.value.company.title
+  leftFields[5].label = employeeDetails.value.university
+  leftFields[6].label = employeeDetails.value.location
+  leftFields[7].label = employeeDetails.value.address.city + ' ' + employeeDetails.value.address.address
 }
 watch(pageSize, (newSize) => {
   if (newSize >= filteredRows.value.length) {
