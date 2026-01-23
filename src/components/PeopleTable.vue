@@ -62,7 +62,8 @@
       <div class="size-full flex flex-col gap-4">
         <div class="basic-info h-4/5 flex gap-2">
           <div class="left-con w-1/2 grid grid-cols-2 grid-rows-4 gap-3">
-            <div class="shadow-md p-3 rounded-lg flex flex-col items-center justify-center text-sm" v-for="item in leftFields">
+            <div class="shadow-md p-3 rounded-lg flex flex-col items-center justify-center text-sm"
+              v-for="item in leftFields">
               <p class="w-full font-bold text-start">{{ item.title }}</p>
               <p class="text-center">{{ item.label }}</p>
             </div>
@@ -79,10 +80,11 @@
   </DetailModal>
 </template>
 <script setup>
-import { computed, inject, onMounted, reactive, ref, watch } from 'vue'
+import { computed, inject, onMounted, reactive, ref, watch, watchEffect } from 'vue'
 import DetailModal from './DetailModal.vue'
 const selectedFilter = inject('selectedFilter')
 const blueButton = inject('blueButton')
+const searchedVal = inject('searchedVal')
 const tableHeaders = reactive([
   { label: 'Name', key: 'name' },
   { label: 'Role', key: 'role' },
@@ -100,39 +102,16 @@ const totalRows = computed(() => Math.ceil(tableRows.length / pageSize.value))
 const modalOpen = ref(false)
 const employeeDetails = ref({})
 const leftFields = reactive([
-  {
-    title: 'Full Name:',
-    label: ''
-  },
-  {
-    title: 'Birth Date:',
-    label: ''
-  },
-  {
-    title: 'Gender:',
-    label: ''
-  },
-  {
-    title: 'Department:',
-    label: ''
-  },
-  {
-    title: 'Title:',
-    label: ''
-  },
-  {
-    title: 'Education:',
-    label: ''
-  },
-  {
-    title: 'Location:',
-    label: ''
-  },
-  {
-    title: 'Address:',
-    label: ''
-  },
+  { key: 'fullName', title: 'Full Name:', label: '' },
+  { key: 'birthDate', title: 'Birth Date:', label: '' },
+  { key: 'gender', title: 'Gender:', label: '' },
+  { key: 'department', title: 'Department:', label: '' },
+  { key: 'title', title: 'Title:', label: '' },
+  { key: 'education', title: 'Education:', label: '' },
+  { key: 'location', title: 'Location:', label: '' },
+  { key: 'address', title: 'Address:', label: '' },
 ])
+
 const modalButtons = [
   {
     style: blueButton.value + ' self-start',
@@ -180,12 +159,21 @@ const isPageFullySelected = computed(
     paginatedRows.value.every((row) => selectedIds.value.has(row.id)),
 )
 const filteredRows = computed(() => {
-  if (tableRows.filter((row) => row.status === selectedFilter.value).length === 0) {
-    return tableRows
-  } else {
-    return tableRows.filter((row) => row.status === selectedFilter.value)
-  }
+  const search = searchedVal.value.trim().toLowerCase()
+  const filter = selectedFilter.value
+
+  return tableRows.filter((row) => {
+    const matchesStatus =
+      !filter || row.status === filter || row.department === filter || row.role === filter
+
+    const matchesSearch =
+      !search || row.name.toLowerCase().includes(search)
+    
+    const allMatches = !filter && row.status === filter && row.department === filter && row.role === filter
+    return allMatches || matchesStatus && matchesSearch
+  })
 })
+
 const paginatedRows = computed(() => {
   const start = (curPage.value - 1) * pageSize.value
   const end = start + pageSize.value
@@ -206,19 +194,27 @@ const lastPage = computed(() => Math.ceil(filteredRows.value.length / pageSize.v
 const onOpen = (row) => {
   modalOpen.value = true
   employeeDetails.value = tableRows.find((r) => r.id === row.id)
-  console.log(employeeDetails.value)
-  leftFields[0].label = employeeDetails.value.firstName + ' ' + employeeDetails.value.lastName
-  leftFields[1].label = employeeDetails.value.birthDate
-  leftFields[2].label = employeeDetails.value.gender[0].toUpperCase() + employeeDetails.value.gender.slice(1,employeeDetails.value.gender.length)
-  leftFields[3].label = employeeDetails.value.company.department
-  leftFields[4].label = employeeDetails.value.company.title
-  leftFields[5].label = employeeDetails.value.university
-  leftFields[6].label = employeeDetails.value.location
-  leftFields[7].label = employeeDetails.value.address.city + ' ' + employeeDetails.value.address.address
+
+  const map = {
+    fullName: `${employeeDetails.value.firstName} ${employeeDetails.value.lastName}`,
+    birthDate: employeeDetails.value.birthDate,
+    gender: employeeDetails.value.gender.charAt(0).toUpperCase() + employeeDetails.value.gender.slice(1),
+    department: employeeDetails.value.company.department,
+    title: employeeDetails.value.company.title,
+    education: employeeDetails.value.university,
+    location: employeeDetails.value.location,
+    address: `${employeeDetails.value.address.city} ${employeeDetails.value.address.address}`,
+  }
+
+  leftFields.forEach((field) => {
+    field.label = map[field.key] ?? '-'
+  })
 }
+
 watch(pageSize, (newSize) => {
   if (newSize >= filteredRows.value.length) {
     curPage.value = 1
   }
 })
+console.log(tableRows)
 </script>

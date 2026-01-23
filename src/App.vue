@@ -14,7 +14,9 @@
 import HeaderVue from './components/HeaderVue.vue'
 import { provide, ref } from 'vue'
 const selectedFilter = ref('')
+const searchedVal = ref('')
 const blueButton = ref('bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600')
 provide('selectedFilter', selectedFilter)
+provide('searchedVal', searchedVal)
 provide('blueButton', blueButton)
 </script>

@@ -1,41 +1,33 @@
 <template>
     <div class="filter-main flex flex-row gap-4 w-full py-2">
-        <div class="filter-left flex w-4/5 bg-white p-4 rounded-lg gap-4">
+        <div class="filter-left flex justify-start w-3/5 bg-white p-4 rounded-lg gap-4">
             <DropdownCombo v-for="filter in leftFilters" :key="filter.label" :label="filter.label"
                 :comboOptions="filter.options" :comboStyle="filterStyle" v-model="filter.value"
-                :containerStyle="'w-1/7'" @change="onFilterChange" @click="onClick" />
-            <div class="search-con flex items-center">
-                <input type="text" v-model="searchQuery" placeholder="Search..."
-                    class="rounded-full px-4 py-2 shadow-md" />
-                <button class="bg-blue-500 text-white rounded-full px-4 py-2 ml-2" @click="onSearch">
-                    Search
-                </button>
-            </div>
+                :containerStyle="'w-1/6 flex'" @change="onFilterChange" @click="onClick" />
+                <button class="clear-filter bg-blue-500 text-white rounded-full px-4 py-2 ml-2 hover:bg-blue-600" @click="onFilterChange"> Clear Filters </button>
+            
         </div>
-        <div class="filter-right flex gap-4 justify-center w-1/5 bg-white p-4 rounded-lg">
-            <div class="action-btn flex" v-for="action in actionButtons">
-                <button :class="buttonStyle">
-                    {{ action.label }}
+        <div class="filter-right flex justify-end gap-4 w-2/5 bg-white p-4 rounded-lg">
+                <div class="search-con flex gap-4 items-center">
+                <input type="text" v-model="searchedVal" placeholder="Type Your Search..."
+                    class="rounded-full px-4 py-2 shadow-md" />
+                <button class="bg-blue-500 text-white rounded-full px-4 py-2 ml-2 w-20" @click="searchedVal = ''">
+                    Clear
                 </button>
             </div>
         </div>
     </div>
-</template>
+</template> 
 <script setup>
-import { inject, reactive, ref } from 'vue'
+import { inject, reactive, ref, defineEmits } from 'vue'
 import DropdownCombo from './DropdownCombo.vue'
-const searchQuery = ref('')
+const emit = defineEmits('click') 
 const departmentOptions = ref([])
-const filterStyle = 'shadow-md rounded-lg p-2'
-const buttonStyle = 'bg-white text-black rounded-full shadow-md rounded-lg px-2'
-
+const roleOptions = ref([])
+const filterStyle = 'shadow-md rounded-lg p-2 w-full'
 const selectedFilter = inject('selectedFilter')
+const searchedVal = inject('searchedVal')
 const leftFilters = reactive([
-    {
-        label: 'Column',
-        options: ['Active', 'Inactive', 'Pending'],
-        value: '',
-    },
     {
         label: 'Department',
         options: departmentOptions.value,
@@ -43,37 +35,16 @@ const leftFilters = reactive([
     },
     {
         label: 'Role',
-        options: ['Manager', 'Employee', 'Intern'],
-        value: '',
-    },
-    {
-        label: 'Lifecycle',
-        options: ['Admin', 'Editor', 'Viewer'],
+        options: roleOptions.value,
         value: '',
     },
     {
         label: 'Status',
-        options: ['Active', 'Inactive', 'Pending'],
-        value: '',
-    },
-    {
-        label: 'Entity',
-        options: ['Tag1', 'Tag2', 'Tag3'],
+        options: ['Active', 'Inactive'],
         value: '',
     },
 ])
 
-const actionButtons = [
-    {
-        label: 'Role',
-    },
-    {
-        label: 'Location',
-    },
-    {
-        label: 'Team',
-    },
-]
 async function getData() {
     const url = 'https://dummyjson.com/users'
     try {
@@ -84,6 +55,9 @@ async function getData() {
                     if (!departmentOptions.value.includes(user.company.department)) {
                         departmentOptions.value.push(user.company.department)
                     }
+                    if(!roleOptions.value.includes(user.company.title)){
+                        roleOptions.value.push(user.company.title)
+                    }
                 })
             })
     } catch (error) {
@@ -92,12 +66,22 @@ async function getData() {
 }
 const onClick = () => {
     getData()
-    console.log(departmentOptions.value)
 }
-const onSearch = (event) => {
-    console.log('Search query:', searchQuery.value)
+const onSearch = () => {
+    console.log(this)
 }
 const onFilterChange = (val) => {
-    selectedFilter.value = val
+  if (val instanceof Event) {
+    selectedFilter.value = ''
+    leftFilters.forEach(f => f.value = '')
+    return
+  }
+  selectedFilter.value = val
+  leftFilters.forEach(f => {
+    if (f.value !== val) {
+      f.value = ''
+    }
+  })
 }
+
 </script>
